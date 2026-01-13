@@ -5,7 +5,7 @@ permissions: read-all
 on:
   schedule:
     # Run every 1 hours
-    - cron: '0 * * * *'
+    - cron: '0 * * * 1'
   workflow_dispatch:
 
 jobs:
@@ -45,29 +45,44 @@ jobs:
           sudo mkdir -p /tmp/renovate
           sudo chown -R 12021:0 /tmp/renovate
 
-      # Run Renovate
-      - name: Self-hosted Renovate
+      # Run Renovate (GitHub)
+      - name: Self-hosted Renovate (GitHub)
+        if: matrix.platform == 'github'
         uses: renovatebot/github-action@v44.2.4
         with:
           configurationFile: renovate-config.js
-          # Token selection logic:
-          # - GitHub: Use native App authentication (App ID + Private Key in env)
-          # - Codeberg: Use the stored Bot Personal Access Token
-          token: ${{ matrix.platform == 'forgejo' && secrets.CODEBERG_TOKEN || '' }}
-          renovate-version: 42.80.2-full # Pinning a recent version is recommended
+          # Use GITHUB_TOKEN as a placeholder to satisfy the action's requirement.
+          # Renovate will use the App ID/Key from env for actual operations.
+          token: ${{ secrets.GITHUB_TOKEN }}
+          renovate-version: 42.80.2-full
         env:
           # GitHub App Authentication (Enables multi-installation discovery)
-          RENOVATE_APP_ID: ${{ matrix.platform == 'github' && vars.RENOVATE_APP_ID || '' }}
-          RENOVATE_PRIVATE_KEY: ${{ matrix.platform == 'github' && secrets.RENOVATE_PRIVATE_KEY || '' }}
-          # Pass matrix values to the configuration file via env vars
+          RENOVATE_APP_ID: ${{ vars.RENOVATE_APP_ID }}
+          RENOVATE_PRIVATE_KEY: ${{ secrets.RENOVATE_PRIVATE_KEY }}
+          # Pass matrix values
           RENOVATE_PLATFORM: ${{ matrix.platform }}
           RENOVATE_ENDPOINT: ${{ matrix.endpoint }}
           RENOVATE_USERNAME: ${{ matrix.renovate_username }}
           RENOVATE_GIT_AUTHOR: ${{ matrix.git_author }}
-          # Optional: Filter which repos to discover (useful for testing or limiting scope)
-          # You can set this secret/var per environment or globally
           RENOVATE_AUTODISCOVER_FILTER: ${{ vars.RENOVATE_AUTODISCOVER_FILTER }}
-          LOG_LEVEL: info
+          LOG_LEVEL: debug
+
+      # Run Renovate (Forgejo/Codeberg)
+      - name: Self-hosted Renovate (Forgejo)
+        if: matrix.platform == 'forgejo'
+        uses: renovatebot/github-action@v44.2.4
+        with:
+          configurationFile: renovate-config.js
+          token: ${{ secrets.CODEBERG_TOKEN }}
+          renovate-version: 42.80.2-full
+        env:
+          # Pass matrix values (No GitHub App env vars here to avoid auth conflicts)
+          RENOVATE_PLATFORM: ${{ matrix.platform }}
+          RENOVATE_ENDPOINT: ${{ matrix.endpoint }}
+          RENOVATE_USERNAME: ${{ matrix.renovate_username }}
+          RENOVATE_GIT_AUTHOR: ${{ matrix.git_author }}
+          RENOVATE_AUTODISCOVER_FILTER: ${{ vars.RENOVATE_AUTODISCOVER_FILTER }}
+          LOG_LEVEL: debug
 
       - name: Fix Cache Permissions for Save
         if: always()
