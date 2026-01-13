@@ -23,7 +23,7 @@ jobs:
             endpoint: '' # Default GitHub endpoint
             renovate_username: ${{ vars.RENOVATE_USERNAME }}
             git_author: '${{ vars.RENOVATE_USERNAME }}[bot] <${{ vars.RENOVATE_APP_ID }}+${{ vars.RENOVATE_USERNAME }}[bot]@users.noreply.github.com>'
-          - platform: codeberg
+          - platform: forgejo
             endpoint: https://codeberg.org/api/v1
             renovate_username: ${{ vars.CODEBERG_BOT_USERNAME }}
             git_author: '${{ vars.CODEBERG_BOT_USERNAME }} <${{ vars.CODEBERG_BOT_USERNAME }}@noreply.codeberg.org>'
@@ -45,26 +45,20 @@ jobs:
           sudo mkdir -p /tmp/renovate
           sudo chown -R 12021:0 /tmp/renovate
 
-      # GitHub App Token Generation (Only for GitHub platform)
-      - name: Get GitHub App Token
-        if: matrix.platform == 'github'
-        id: get_token
-        uses: actions/create-github-app-token@v1
-        with:
-          app-id: ${{ vars.RENOVATE_APP_ID }}
-          private-key: ${{ secrets.RENOVATE_PRIVATE_KEY }}
-
       # Run Renovate
       - name: Self-hosted Renovate
         uses: renovatebot/github-action@v44.2.4
         with:
           configurationFile: renovate-config.js
           # Token selection logic:
-          # - GitHub: Use the generated App token
+          # - GitHub: Use native App authentication (App ID + Private Key in env)
           # - Codeberg: Use the stored Bot Personal Access Token
-          token: ${{ matrix.platform == 'github' && steps.get_token.outputs.token || secrets.CODEBERG_TOKEN }}
+          token: ${{ matrix.platform == 'forgejo' && secrets.CODEBERG_TOKEN || '' }}
           renovate-version: 42.80.2-full # Pinning a recent version is recommended
         env:
+          # GitHub App Authentication (Enables multi-installation discovery)
+          RENOVATE_APP_ID: ${{ matrix.platform == 'github' && vars.RENOVATE_APP_ID || '' }}
+          RENOVATE_PRIVATE_KEY: ${{ matrix.platform == 'github' && secrets.RENOVATE_PRIVATE_KEY || '' }}
           # Pass matrix values to the configuration file via env vars
           RENOVATE_PLATFORM: ${{ matrix.platform }}
           RENOVATE_ENDPOINT: ${{ matrix.endpoint }}
