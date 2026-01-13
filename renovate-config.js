@@ -9,7 +9,7 @@ module.exports = {
   
   // Discovery
   autodiscover: true,
-  autodiscoverFilter: process.env.RENOVATE_AUTODISCOVER_FILTER,
+  autodiscoverFilter: process.env.RENOVATE_AUTODISCOVER_FILTER || undefined,
   
   // General behavior
   onboarding: true,
