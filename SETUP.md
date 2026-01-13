@@ -34,7 +34,7 @@ This guide explains how to set up the self-hosted Renovate bot for both GitHub a
 
 ### 3. GitHub Repository Secrets
 
-Add the following secrets to your GitHub repository (Settings -> Secrets and variables -> Actions):
+Add the following secrets to your GitHub repository at the **Repository level** (Settings -> Secrets and variables -> Actions -> **Secrets** tab -> **Repository secrets**):
 
 | Secret Name | Description |
 | :--- | :--- |
@@ -43,7 +43,7 @@ Add the following secrets to your GitHub repository (Settings -> Secrets and var
 
 ### 4. GitHub Repository Variables
 
-Add the following variables to your GitHub repository (Settings -> Secrets and variables -> Actions -> Variables):
+Add the following variables to your GitHub repository at the **Repository level** (Settings -> Secrets and variables -> Actions -> **Variables** tab -> **Repository variables**):
 
 | Variable Name | Description | Example |
 | :--- | :--- | :--- |
@@ -59,7 +59,7 @@ Add the following variables to your GitHub repository (Settings -> Secrets and v
 *   `!org/exclude-repo` (Exclude specific repo)
 
 ### Warning!
-- If you plan to make the instance publicly available and without autodiscover filters, read and understand [renovate security best practise] first!(https://docs.renovatebot.com/security-and-permissions)
+- If you plan to make the instance publicly available and without autodiscover filters, read and understand [renovate security best practise](https://docs.renovatebot.com/security-and-permissions) first!
 
 ## How it Works
 
