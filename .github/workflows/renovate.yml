@@ -46,18 +46,19 @@ jobs:
           sudo chown -R 12021:0 /tmp/renovate
 
       # Run Renovate (GitHub)
+      - name: Make entrypoint executable
+        run: chmod +x .github/renovate-entrypoint.sh
+
       - name: Self-hosted Renovate (GitHub)
         if: matrix.platform == 'github'
         uses: renovatebot/github-action@v44.2.4
         with:
           configurationFile: renovate-config.js
           # Use a dummy token to satisfy the action's requirement.
-          # We unset RENOVATE_TOKEN in env to ensure the App ID/Key are used for discovery.
           token: 'dummy'
           renovate-version: 42.80.2-full
+          docker-cmd-file: .github/renovate-entrypoint.sh
         env:
-          # Unset the token passed by the action to allow App-based discovery
-          RENOVATE_TOKEN: ''
           # GitHub App Authentication (Enables multi-installation discovery)
           RENOVATE_APP_ID: ${{ vars.RENOVATE_APP_ID }}
           RENOVATE_PRIVATE_KEY: ${{ secrets.RENOVATE_PRIVATE_KEY }}
