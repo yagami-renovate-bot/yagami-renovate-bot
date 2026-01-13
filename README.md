@@ -34,3 +34,6 @@ Both jobs utilize the same [`renovate-config.js`](renovate-config.js) but adapt 
 
 ## Credits are References:
 - [Renovate Github Action Runner](https://github.com/renovatebot/github-action)
+
+## License
+[AGPLv3 License](LICENSE)
