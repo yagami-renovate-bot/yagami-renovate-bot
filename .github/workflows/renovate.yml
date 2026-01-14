@@ -2,6 +2,10 @@ name: Renovate
 
 permissions: read-all
 
+env:
+  RENOVATE_VERSION: 42.81.5-full
+  RENOVATE_IMAGE: ghcr.io/renovatebot/renovate
+
 on:
   schedule:
     # Run every 1 day
@@ -46,6 +50,19 @@ jobs:
           MATRIX_MAX_PARALLEL: ${{ secrets.MATRIX_MAX_PARALLEL || vars.MATRIX_MAX_PARALLEL || 5 }}
         run: python .github/scripts/get_installations.py
 
+      - name: Cache Renovate Docker Image
+        id: cache-renovate-image
+        uses: actions/cache@v4
+        with:
+          path: renovate-image.tar
+          key: renovate-image-${{ env.RENOVATE_VERSION }}
+
+      - name: Pull and Save Renovate Image
+        if: steps.cache-renovate-image.outputs.cache-hit != 'true'
+        run: |
+          docker pull ${{ env.RENOVATE_IMAGE }}:${{ env.RENOVATE_VERSION }}
+          docker save -o renovate-image.tar ${{ env.RENOVATE_IMAGE }}:${{ env.RENOVATE_VERSION }}
+
   renovate:
     needs: discover
     name: Renovate (${{ matrix.platform }} - ${{ matrix.owner }})
@@ -62,6 +79,16 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v6.0.1
+
+      - name: Restore Renovate Docker Image
+        uses: actions/cache@v4
+        with:
+          path: renovate-image.tar
+          key: renovate-image-${{ env.RENOVATE_VERSION }}
+          fail-on-cache-miss: true
+
+      - name: Load Renovate Docker Image
+        run: docker load -i renovate-image.tar
 
       - name: Cache Renovate
         uses: actions/cache@v5.0.1
@@ -91,7 +118,7 @@ jobs:
         with:
           configurationFile: renovate-config.js
           token: ${{ steps.generate_token.outputs.token }}
-          renovate-version: 42.80.2-full
+          renovate-version: ${{ env.RENOVATE_VERSION }}
         env:
           RENOVATE_PLATFORM: ${{ matrix.platform }}
           RENOVATE_ENDPOINT: ${{ matrix.endpoint }}
@@ -106,7 +133,7 @@ jobs:
         with:
           configurationFile: renovate-config.js
           token: ${{ secrets.CODEBERG_TOKEN }}
-          renovate-version: 42.80.2-full
+          renovate-version: ${{ env.RENOVATE_VERSION }}
         env:
           RENOVATE_PLATFORM: ${{ matrix.platform }}
           RENOVATE_ENDPOINT: ${{ matrix.endpoint }}
