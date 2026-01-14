@@ -65,19 +65,54 @@ jobs:
       - name: Get GitHub App Token
         if: matrix.platform == 'github'
         uses: actions/create-github-app-token@v1
-        id: app-token
+        id: generate_token
         with:
           app-id: ${{ vars.RENOVATE_APP_ID }}
           private-key: ${{ secrets.RENOVATE_PRIVATE_KEY }}
           owner: ${{ matrix.owner }}
 
-      - name: Self-hosted Renovate
+      - name: Verify GitHub Token
+        if: matrix.platform == 'github'
+        run: |
+          if [ -z "${{ steps.generate_token.outputs.token }}" ]; then
+            echo "Error: GitHub token is empty."
+            exit 1
+          else
+            echo "GitHub token is present."
+          fi
+
+      - name: Self-hosted Renovate (GitHub)
+        if: matrix.platform == 'github'
         uses: renovatebot/github-action@v44.2.4
         with:
           configurationFile: renovate-config.js
-          token: ${{ matrix.platform == 'github' && steps.app-token.outputs.token || secrets.CODEBERG_TOKEN }}
+          token: ${{ steps.generate_token.outputs.token }}
           renovate-version: 42.80.2-full
-          docker-cmd-file: .github/renovate-entrypoint.sh
+        env:
+          RENOVATE_PLATFORM: ${{ matrix.platform }}
+          RENOVATE_ENDPOINT: ${{ matrix.endpoint }}
+          RENOVATE_USERNAME: ${{ matrix.renovate_username }}
+          RENOVATE_GIT_AUTHOR: ${{ matrix.git_author }}
+          RENOVATE_AUTODISCOVER_FILTER: ${{ vars.RENOVATE_AUTODISCOVER_FILTER }}
+          LOG_LEVEL: debug
+
+      - name: Verify Codeberg Token
+        if: matrix.platform == 'forgejo'
+        run: |
+          if [ -z "${{ secrets.CODEBERG_TOKEN }}" ]; then
+            echo "Error: Codeberg token is empty."
+            exit 1
+          else
+            echo "Codeberg token is present."
+          fi
+
+      - name: Self-hosted Renovate (Codeberg)
+        if: matrix.platform == 'forgejo'
+        uses: renovatebot/github-action@v44.2.4
+        with:
+          configurationFile: renovate-config.js
+          token: ${{ secrets.CODEBERG_TOKEN }}
+          renovate-version: 42.80.2-full
         env:
           RENOVATE_PLATFORM: ${{ matrix.platform }}
           RENOVATE_ENDPOINT: ${{ matrix.endpoint }}
