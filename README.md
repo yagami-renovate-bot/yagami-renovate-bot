@@ -35,6 +35,44 @@ The workflow runs in two stages:
 
 This allows the bot to seamlessly manage dependencies across multiple GitHub organizations or user accounts.
 
+```mermaid
+graph TD
+    subgraph Discover Job
+        A[Start] --> B{Run get_installations.py};
+        B --> C{For each installation};
+        C --> D{RENOVATE_HASH_ALL_NAMESPACES is true?};
+        D -- Yes --> E[Set Namespace to SHA1 of owner];
+        D -- No --> F{account.user_view_type is private?};
+        F -- Yes --> E;
+        F -- No --> G[Set Namespace to original owner];
+        E --> H[Add resulting namespace to matrix];
+        G --> H;
+        H --> I{All installations processed?};
+        I -- No --> C;
+        I -- Yes --> J[Generate JSON matrix];
+    end
+
+    J --> K[Start Renovate jobs];
+
+    subgraph Renovate Job
+        K --> L[Checkout];
+        L --> M[Restore Cache];
+        M --> N[Fix Cache Permissions Setup];
+        N --> O{Platform?};
+        
+        O -- GitHub --> P[Get GitHub App Token];
+        P --> Q[Verify GitHub Token];
+        Q --> R[Run Renovate GitHub];
+        
+        O -- Forgejo --> S[Verify Codeberg Token];
+        S --> T[Run Renovate Codeberg];
+        
+        R --> U[Fix Cache Permissions Save];
+        T --> U;
+        U --> V[End];
+    end
+```
+
 ## Credits are References:
 - [Renovate Github Action Runner](https://github.com/renovatebot/github-action)
 

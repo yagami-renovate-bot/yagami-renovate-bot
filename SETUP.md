@@ -27,6 +27,8 @@ This guide explains how to set up the self-hosted Renovate bot for both GitHub a
 3.  Generate a Private Key for the App.
 4.  Note the **App ID**.
 5.  Install the App on the repositories you want Renovate to manage.
+    > [!IMPORTANT]
+    > You **MUST** also install the App on the repository hosting the workflow. The workflow needs to generate an installation token to automatically fetch github BOT_USER_ID (different from github APP_ID) and github APP_SLUG
 
 ### 2. Codeberg Bot Account (for Codeberg)
 

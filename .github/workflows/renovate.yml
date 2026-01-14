@@ -4,8 +4,8 @@ permissions: read-all
 
 on:
   schedule:
-    # Run every 1 hours
-    - cron: '0 * * * 1'
+    # Run every 1 day
+    - cron: '0 0 * * *'
   workflow_dispatch:
 
 jobs:
@@ -85,16 +85,6 @@ jobs:
           private-key: ${{ secrets.GOTHUB_PRIVATE_KEY }}
           owner: ${{ matrix.owner }}
 
-      - name: Verify GitHub Token
-        if: matrix.platform == 'github'
-        run: |
-          if [ -z "${{ steps.generate_token.outputs.token }}" ]; then
-            echo "Error: GitHub token is empty."
-            exit 1
-          else
-            echo "GitHub token is present."
-          fi
-
       - name: Self-hosted Renovate (GitHub)
         if: matrix.platform == 'github'
         uses: renovatebot/github-action@v44.2.4
@@ -109,16 +99,6 @@ jobs:
           RENOVATE_GIT_AUTHOR: ${{ matrix.git_author }}
           RENOVATE_AUTODISCOVER_FILTER: ${{ secrets.RENOVATE_AUTODISCOVER_FILTER || vars.RENOVATE_AUTODISCOVER_FILTER }}
           LOG_LEVEL: ${{ secrets.LOG_LEVEL || vars.LOG_LEVEL || 'fatal' }} # Defaults to max level to prevent info leaks on action log
-
-      - name: Verify Codeberg Token
-        if: matrix.platform == 'forgejo'
-        run: |
-          if [ -z "${{ secrets.CODEBERG_TOKEN }}" ]; then
-            echo "Error: Codeberg token is empty."
-            exit 1
-          else
-            echo "Codeberg token is present."
-          fi
 
       - name: Self-hosted Renovate (Codeberg)
         if: matrix.platform == 'forgejo'
