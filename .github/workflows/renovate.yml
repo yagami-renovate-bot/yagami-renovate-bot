@@ -45,6 +45,12 @@ jobs:
           sudo mkdir -p /tmp/renovate
           sudo chown -R 12021:0 /tmp/renovate
 
+      - name: Debug Environment Variables
+        run: |
+          echo "Debug: Checking variables..."
+          echo "RENOVATE_APP_ID is set: ${{ vars.RENOVATE_APP_ID != '' }}"
+          echo "RENOVATE_USERNAME is set: ${{ vars.RENOVATE_USERNAME != '' }}"
+
       # Run Renovate (GitHub)
       - name: Make entrypoint executable
         run: chmod +x .github/renovate-entrypoint.sh
