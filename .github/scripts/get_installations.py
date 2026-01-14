@@ -73,7 +73,7 @@ def main():
     # Forgejo (Static) - Prepend as requested
     forgejo_entry = {
         "platform": "forgejo",
-        "owner": "ALL",
+        "owner": "Codeberg",
         "installation_id": None,
         "endpoint": "https://codeberg.org/api/v1",
         "renovate_username": codeberg_bot_username,

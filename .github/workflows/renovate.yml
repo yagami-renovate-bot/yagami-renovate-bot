@@ -76,9 +76,6 @@ jobs:
           sudo mkdir -p /tmp/renovate
           sudo chown -R 12021:0 /tmp/renovate
 
-      - name: Make entrypoint executable
-        run: chmod +x .github/renovate-entrypoint.sh
-
       - name: Get GitHub App Token
         if: matrix.platform == 'github'
         uses: actions/create-github-app-token@v1
