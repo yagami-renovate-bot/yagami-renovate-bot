@@ -50,18 +50,25 @@ jobs:
           MATRIX_MAX_PARALLEL: ${{ secrets.MATRIX_MAX_PARALLEL || vars.MATRIX_MAX_PARALLEL || 5 }}
         run: python .github/scripts/get_installations.py
 
+      - name: Free Disk Space (Discover)
+        run: |
+          sudo rm -rf /usr/share/dotnet
+          sudo rm -rf /usr/local/lib/android
+          sudo rm -rf /opt/ghc
+          sudo rm -rf /opt/hostedtoolcache/CodeQL
+
       - name: Cache Renovate Docker Image
         id: cache-renovate-image
         uses: actions/cache@v4
         with:
-          path: renovate-image.tar
+          path: renovate-image.tar.gz
           key: renovate-image-${{ env.RENOVATE_VERSION }}
 
       - name: Pull and Save Renovate Image
         if: steps.cache-renovate-image.outputs.cache-hit != 'true'
         run: |
           docker pull ${{ env.RENOVATE_IMAGE }}:${{ env.RENOVATE_VERSION }}
-          docker save -o renovate-image.tar ${{ env.RENOVATE_IMAGE }}:${{ env.RENOVATE_VERSION }}
+          docker save ${{ env.RENOVATE_IMAGE }}:${{ env.RENOVATE_VERSION }} | gzip > renovate-image.tar.gz
 
   renovate:
     needs: discover
@@ -80,15 +87,22 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6.0.1
 
+      - name: Free Disk Space (Renovate)
+        run: |
+          sudo rm -rf /usr/share/dotnet
+          sudo rm -rf /usr/local/lib/android
+          sudo rm -rf /opt/ghc
+          sudo rm -rf /opt/hostedtoolcache/CodeQL
+
       - name: Restore Renovate Docker Image
         uses: actions/cache@v4
         with:
-          path: renovate-image.tar
+          path: renovate-image.tar.gz
           key: renovate-image-${{ env.RENOVATE_VERSION }}
           fail-on-cache-miss: true
 
       - name: Load Renovate Docker Image
-        run: docker load -i renovate-image.tar
+        run: docker load < renovate-image.tar.gz
 
       - name: Cache Renovate
         uses: actions/cache@v5.0.1
