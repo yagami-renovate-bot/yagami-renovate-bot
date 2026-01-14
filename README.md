@@ -9,7 +9,9 @@ This project provides a template to easily set up and run your own Renovate bot 
 ## Features
 
 -   **Multi-Platform Support:** Runs Renovate for both GitHub and Codeberg repositories in parallel.
--   **Multi-Tenant GitHub Support:** Manages multiple GitHub organizations or user accounts with a single workflow.
+-   **Multi-Tenant GitHub Support:** Manages multiple GitHub organizations or user accounts with a single workflow using matrix.
+    -   Each namespace (org/user name) within the matrix will spawn a new job with name `Renovate (github - {namespace})`
+    -   Automatically hashes the names of private namespaces in job names. See the [Setup Guide](SETUP.md) for more details.
 -   **Serverless:** Runs entirely on GitHub Actions (no VPS required).
 -   **Template Ready:** Designed to be used as a GitHub Repository Template.
 -   **Secure:** Uses GitHub Apps and Secrets for authentication.

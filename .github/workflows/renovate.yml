@@ -13,20 +13,37 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
+      max_parallel: ${{ steps.set-matrix.outputs.max_parallel }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: '3.x'
       - run: pip install requests pyjwt cryptography
+      - name: Get GitHub App Token
+        uses: actions/create-github-app-token@v1
+        id: generate_token
+        with:
+          app-id: ${{ secrets.GITHUB_APP_ID || vars.GITHUB_APP_ID }}
+          private-key: ${{ secrets.GITHUB_PRIVATE_KEY }}
+
+      - name: Get Bot User ID
+        id: get_bot_user_id
+        run: echo "BOT_USER_ID=$(gh api "/users/${{ steps.generate_token.outputs.app-slug }}[bot]" --jq .id)" >> $GITHUB_OUTPUT
+        env:
+          GH_TOKEN: ${{ steps.generate_token.outputs.token }}
+
       - name: Generate Matrix
         id: set-matrix
         env:
-          RENOVATE_APP_ID: ${{ vars.RENOVATE_APP_ID }}
-          RENOVATE_PRIVATE_KEY: ${{ secrets.RENOVATE_PRIVATE_KEY }}
-          RENOVATE_USERNAME: ${{ vars.RENOVATE_USERNAME }}
-          CODEBERG_BOT_USERNAME: ${{ vars.CODEBERG_BOT_USERNAME }}
-          RENOVATE_INSTALLATION_WHITELIST: ${{ vars.RENOVATE_INSTALLATION_WHITELIST }}
+          GITHUB_APP_ID: ${{ secrets.GITHUB_APP_ID || vars.GITHUB_APP_ID }}
+          GITHUB_PRIVATE_KEY: ${{ secrets.GITHUB_PRIVATE_KEY }}
+          CODEBERG_BOT_USERNAME: ${{ secrets.CODEBERG_BOT_USERNAME || vars.CODEBERG_BOT_USERNAME }}
+          GITHUB_INSTALLATION_WHITELIST: ${{ secrets.GITHUB_INSTALLATION_WHITELIST || vars.GITHUB_INSTALLATION_WHITELIST }}
+          RENOVATE_BOT_USER_ID: ${{ steps.get_bot_user_id.outputs.BOT_USER_ID }}
+          RENOVATE_APP_SLUG: ${{ steps.generate_token.outputs.app-slug }}
+          RENOVATE_HASH_ALL_NAMESPACES: ${{ secrets.RENOVATE_HASH_ALL_NAMESPACES || vars.RENOVATE_HASH_ALL_NAMESPACES }}
+          MATRIX_MAX_PARALLEL: ${{ secrets.MATRIX_MAX_PARALLEL || vars.MATRIX_MAX_PARALLEL || 5 }}
         run: python .github/scripts/get_installations.py
 
   renovate:
@@ -38,7 +55,7 @@ jobs:
       cancel-in-progress: false
     strategy:
       fail-fast: false
-      max-parallel: 5
+      max-parallel: ${{ fromJson(needs.discover.outputs.max_parallel) }}
       matrix:
         include: ${{ fromJson(needs.discover.outputs.matrix) }}
 
@@ -67,8 +84,8 @@ jobs:
         uses: actions/create-github-app-token@v1
         id: generate_token
         with:
-          app-id: ${{ vars.RENOVATE_APP_ID }}
-          private-key: ${{ secrets.RENOVATE_PRIVATE_KEY }}
+          app-id: ${{ secrets.GITHUB_APP_ID || vars.GITHUB_APP_ID }}
+          private-key: ${{ secrets.GITHUB_PRIVATE_KEY }}
           owner: ${{ matrix.owner }}
 
       - name: Verify GitHub Token
@@ -93,8 +110,8 @@ jobs:
           RENOVATE_ENDPOINT: ${{ matrix.endpoint }}
           RENOVATE_USERNAME: ${{ matrix.renovate_username }}
           RENOVATE_GIT_AUTHOR: ${{ matrix.git_author }}
-          RENOVATE_AUTODISCOVER_FILTER: ${{ vars.RENOVATE_AUTODISCOVER_FILTER }}
-          LOG_LEVEL: debug
+          RENOVATE_AUTODISCOVER_FILTER: ${{ secrets.RENOVATE_AUTODISCOVER_FILTER || vars.RENOVATE_AUTODISCOVER_FILTER }}
+          LOG_LEVEL: ${{ secrets.LOG_LEVEL || vars.LOG_LEVEL || 'fatal' }} # Defaults to max level to prevent info leaks on action log
 
       - name: Verify Codeberg Token
         if: matrix.platform == 'forgejo'
@@ -118,10 +135,11 @@ jobs:
           RENOVATE_ENDPOINT: ${{ matrix.endpoint }}
           RENOVATE_USERNAME: ${{ matrix.renovate_username }}
           RENOVATE_GIT_AUTHOR: ${{ matrix.git_author }}
-          RENOVATE_AUTODISCOVER_FILTER: ${{ vars.RENOVATE_AUTODISCOVER_FILTER }}
-          LOG_LEVEL: debug
+          RENOVATE_AUTODISCOVER_FILTER: ${{ secrets.RENOVATE_AUTODISCOVER_FILTER || vars.RENOVATE_AUTODISCOVER_FILTER }}
+          LOG_LEVEL: ${{ secrets.LOG_LEVEL || vars.LOG_LEVEL || 'fatal' }} # Defaults to max level to prevent info leaks on action log
 
       - name: Fix Cache Permissions for Save
         if: always()
         run: |
           sudo chown -R $USER /tmp/renovate
+
