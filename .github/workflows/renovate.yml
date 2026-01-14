@@ -9,24 +9,38 @@ on:
   workflow_dispatch:
 
 jobs:
+  discover:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+      - run: pip install requests pyjwt cryptography
+      - name: Generate Matrix
+        id: set-matrix
+        env:
+          RENOVATE_APP_ID: ${{ vars.RENOVATE_APP_ID }}
+          RENOVATE_PRIVATE_KEY: ${{ secrets.RENOVATE_PRIVATE_KEY }}
+          RENOVATE_USERNAME: ${{ vars.RENOVATE_USERNAME }}
+          CODEBERG_BOT_USERNAME: ${{ vars.CODEBERG_BOT_USERNAME }}
+          RENOVATE_INSTALLATION_WHITELIST: ${{ vars.RENOVATE_INSTALLATION_WHITELIST }}
+        run: python .github/scripts/get_installations.py
+
   renovate:
-    name: Renovate (${{ matrix.platform }})
+    needs: discover
+    name: Renovate (${{ matrix.platform }} - ${{ matrix.owner }})
     runs-on: ubuntu-latest
     concurrency:
-      group: renovate-${{ matrix.platform }}
+      group: renovate-${{ matrix.platform }}-${{ matrix.owner }}
       cancel-in-progress: false
     strategy:
       fail-fast: false
+      max-parallel: 5
       matrix:
-        include:
-          - platform: github
-            endpoint: '' # Default GitHub endpoint
-            renovate_username: ${{ vars.RENOVATE_USERNAME }}
-            git_author: '${{ vars.RENOVATE_USERNAME }}[bot] <${{ vars.RENOVATE_APP_ID }}+${{ vars.RENOVATE_USERNAME }}[bot]@users.noreply.github.com>'
-          - platform: forgejo
-            endpoint: https://codeberg.org/api/v1
-            renovate_username: ${{ vars.CODEBERG_BOT_USERNAME }}
-            git_author: '${{ vars.CODEBERG_BOT_USERNAME }} <${{ vars.CODEBERG_BOT_USERNAME }}@noreply.codeberg.org>'
+        include: ${{ fromJson(needs.discover.outputs.matrix) }}
 
     steps:
       - name: Checkout
@@ -36,56 +50,35 @@ jobs:
         uses: actions/cache@v5.0.1
         with:
           path: /tmp/renovate
-          key: renovate-${{ matrix.platform }}-${{ github.run_id }}
+          key: renovate-${{ matrix.platform }}-${{ matrix.owner }}-${{ github.run_id }}
           restore-keys: |
-            renovate-${{ matrix.platform }}-
+            renovate-${{ matrix.platform }}-${{ matrix.owner }}-
 
       - name: Fix Cache Permissions
         run: |
           sudo mkdir -p /tmp/renovate
           sudo chown -R 12021:0 /tmp/renovate
 
-      - name: Debug Environment Variables
-        run: |
-          echo "Debug: Checking variables..."
-          echo "RENOVATE_APP_ID is set: ${{ vars.RENOVATE_APP_ID != '' }}"
-          echo "RENOVATE_USERNAME is set: ${{ vars.RENOVATE_USERNAME != '' }}"
-
-      # Run Renovate (GitHub)
       - name: Make entrypoint executable
         run: chmod +x .github/renovate-entrypoint.sh
 
-      - name: Self-hosted Renovate (GitHub)
+      - name: Get GitHub App Token
         if: matrix.platform == 'github'
+        uses: actions/create-github-app-token@v1
+        id: app-token
+        with:
+          app-id: ${{ vars.RENOVATE_APP_ID }}
+          private-key: ${{ secrets.RENOVATE_PRIVATE_KEY }}
+          owner: ${{ matrix.owner }}
+
+      - name: Self-hosted Renovate
         uses: renovatebot/github-action@v44.2.4
         with:
           configurationFile: renovate-config.js
-          # Use a dummy token to satisfy the action's requirement.
-          token: 'dummy'
+          token: ${{ matrix.platform == 'github' && steps.app-token.outputs.token || secrets.CODEBERG_TOKEN }}
           renovate-version: 42.80.2-full
           docker-cmd-file: .github/renovate-entrypoint.sh
         env:
-          # GitHub App Authentication (Enables multi-installation discovery)
-          RENOVATE_APP_ID: ${{ vars.RENOVATE_APP_ID }}
-          RENOVATE_PRIVATE_KEY: ${{ secrets.RENOVATE_PRIVATE_KEY }}
-          # Pass matrix values
-          RENOVATE_PLATFORM: ${{ matrix.platform }}
-          RENOVATE_ENDPOINT: ${{ matrix.endpoint }}
-          RENOVATE_USERNAME: ${{ matrix.renovate_username }}
-          RENOVATE_GIT_AUTHOR: ${{ matrix.git_author }}
-          RENOVATE_AUTODISCOVER_FILTER: ${{ vars.RENOVATE_AUTODISCOVER_FILTER }}
-          LOG_LEVEL: debug
-
-      # Run Renovate (Forgejo/Codeberg)
-      - name: Self-hosted Renovate (Forgejo)
-        if: matrix.platform == 'forgejo'
-        uses: renovatebot/github-action@v44.2.4
-        with:
-          configurationFile: renovate-config.js
-          token: ${{ secrets.CODEBERG_TOKEN }}
-          renovate-version: 42.80.2-full
-        env:
-          # Pass matrix values (No GitHub App env vars here to avoid auth conflicts)
           RENOVATE_PLATFORM: ${{ matrix.platform }}
           RENOVATE_ENDPOINT: ${{ matrix.endpoint }}
           RENOVATE_USERNAME: ${{ matrix.renovate_username }}

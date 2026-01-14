@@ -1,11 +1,4 @@
 // Dynamically build the configuration based on environment variables
-console.log("DEBUG: Loading renovate-config.js");
-console.log(`DEBUG: Platform: ${process.env.RENOVATE_PLATFORM}`);
-console.log(`DEBUG: App ID present: ${!!process.env.RENOVATE_APP_ID}`);
-if (process.env.RENOVATE_APP_ID) {
-  console.log(`DEBUG: App ID length: ${process.env.RENOVATE_APP_ID.length}`);
-}
-
 const config = {
   dryRun: 'full',
   platform: process.env.RENOVATE_PLATFORM,

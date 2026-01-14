@@ -9,6 +9,7 @@ This project provides a template to easily set up and run your own Renovate bot 
 ## Features
 
 -   **Multi-Platform Support:** Runs Renovate for both GitHub and Codeberg repositories in parallel.
+-   **Multi-Tenant GitHub Support:** Manages multiple GitHub organizations or user accounts with a single workflow.
 -   **Serverless:** Runs entirely on GitHub Actions (no VPS required).
 -   **Template Ready:** Designed to be used as a GitHub Repository Template.
 -   **Secure:** Uses GitHub Apps and Secrets for authentication.
@@ -26,11 +27,11 @@ For complete installation and configuration instructions, please refer to the **
 
 ## How It Works
 
-The workflow defines a build matrix that spawns two jobs:
-1.  **GitHub Job:** Authenticates as a GitHub App to manage GitHub repositories.
-2.  **Codeberg Job:** Authenticates as a Codeberg Bot to manage Codeberg repositories.
+The workflow runs in two stages:
+1.  A **`discover`** job fetches all GitHub App installations and generates a dynamic build matrix.
+2.  A **`renovate`** job then runs for each installation in parallel, alongside a static job for Codeberg.
 
-Both jobs utilize the same [`renovate-config.js`](renovate-config.js) but adapt dynamically to the target platform using environment variables.
+This allows the bot to seamlessly manage dependencies across multiple GitHub organizations or user accounts.
 
 ## Credits are References:
 - [Renovate Github Action Runner](https://github.com/renovatebot/github-action)
