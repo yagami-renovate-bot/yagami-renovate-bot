@@ -59,7 +59,7 @@ jobs:
 
       - name: Cache Renovate Docker Image
         id: cache-renovate-image
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: renovate-image.tar.gz
           key: renovate-image-${{ env.RENOVATE_VERSION }}
@@ -95,7 +95,7 @@ jobs:
           sudo rm -rf /opt/hostedtoolcache/CodeQL
 
       - name: Restore Renovate Docker Image
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: renovate-image.tar.gz
           key: renovate-image-${{ env.RENOVATE_VERSION }}
