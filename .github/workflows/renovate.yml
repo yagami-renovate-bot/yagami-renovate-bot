@@ -19,13 +19,13 @@ jobs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
       max_parallel: ${{ steps.set-matrix.outputs.max_parallel }}
     steps:
-      - uses: actions/checkout@v6
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v6.0.1
+      - uses: actions/setup-python@v6.1.0
         with:
           python-version: '3.x'
       - run: pip install requests pyjwt cryptography
       - name: Get GitHub App Token
-        uses: actions/create-github-app-token@v1
+        uses: actions/create-github-app-token@v2.2.1
         id: generate_token
         with:
           app-id: ${{ secrets.GOTHUB_APP_ID || vars.GOTHUB_APP_ID }}
@@ -50,19 +50,21 @@ jobs:
           MATRIX_MAX_PARALLEL: ${{ secrets.MATRIX_MAX_PARALLEL || vars.MATRIX_MAX_PARALLEL || 5 }}
         run: python .github/scripts/get_installations.py
 
+      - name: Cache Renovate Docker Image
+        id: cache-renovate-image
+        uses: actions/cache@v5.0.1
+        with:
+          path: renovate-image.tar.gz
+          key: renovate-image-${{ env.RENOVATE_VERSION }}
+          lookup-only: true
+
       - name: Free Disk Space (Discover)
+        if: steps.cache-renovate-image.outputs.cache-hit != 'true'
         run: |
           sudo rm -rf /usr/share/dotnet
           sudo rm -rf /usr/local/lib/android
           sudo rm -rf /opt/ghc
           sudo rm -rf /opt/hostedtoolcache/CodeQL
-
-      - name: Cache Renovate Docker Image
-        id: cache-renovate-image
-        uses: actions/cache@v5
-        with:
-          path: renovate-image.tar.gz
-          key: renovate-image-${{ env.RENOVATE_VERSION }}
 
       - name: Pull and Save Renovate Image
         if: steps.cache-renovate-image.outputs.cache-hit != 'true'
@@ -95,13 +97,14 @@ jobs:
           sudo rm -rf /opt/hostedtoolcache/CodeQL
 
       - name: Restore Renovate Docker Image
-        uses: actions/cache@v5
+        id: restore-renovate-image
+        uses: actions/cache@v5.0.1
         with:
           path: renovate-image.tar.gz
           key: renovate-image-${{ env.RENOVATE_VERSION }}
-          fail-on-cache-miss: true
 
       - name: Load Renovate Docker Image
+        if: steps.restore-renovate-image.outputs.cache-hit == 'true'
         run: docker load < renovate-image.tar.gz
 
       - name: Cache Renovate
@@ -119,7 +122,7 @@ jobs:
 
       - name: Get GitHub App Token
         if: matrix.platform == 'github'
-        uses: actions/create-github-app-token@v1
+        uses: actions/create-github-app-token@v2.2.1
         id: generate_token
         with:
           app-id: ${{ secrets.GOTHUB_APP_ID || vars.GOTHUB_APP_ID }}
@@ -160,4 +163,3 @@ jobs:
         if: always()
         run: |
           sudo chown -R $USER /tmp/renovate
-
