@@ -54,7 +54,7 @@ jobs:
         id: cache-renovate-image
         uses: actions/cache@v5.0.1
         with:
-          path: renovate-image.tar.gz
+          path: renovate-image.tar.zst
           key: renovate-image-${{ env.RENOVATE_VERSION }}
           lookup-only: true
 
@@ -70,7 +70,7 @@ jobs:
         if: steps.cache-renovate-image.outputs.cache-hit != 'true'
         run: |
           docker pull ${{ env.RENOVATE_IMAGE }}:${{ env.RENOVATE_VERSION }}
-          docker save ${{ env.RENOVATE_IMAGE }}:${{ env.RENOVATE_VERSION }} | gzip > renovate-image.tar.gz
+          docker save ${{ env.RENOVATE_IMAGE }}:${{ env.RENOVATE_VERSION }} | zstd -T0 > renovate-image.tar.zst
 
   renovate:
     needs: discover
@@ -100,12 +100,12 @@ jobs:
         id: restore-renovate-image
         uses: actions/cache@v5.0.1
         with:
-          path: renovate-image.tar.gz
+          path: renovate-image.tar.zst
           key: renovate-image-${{ env.RENOVATE_VERSION }}
 
       - name: Load Renovate Docker Image
         if: steps.restore-renovate-image.outputs.cache-hit == 'true'
-        run: docker load < renovate-image.tar.gz
+        run: zstd -dc -T0 renovate-image.tar.zst | docker load
 
       - name: Cache Renovate
         uses: actions/cache@v5.0.1
