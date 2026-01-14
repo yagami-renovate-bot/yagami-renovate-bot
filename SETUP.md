@@ -45,7 +45,7 @@ Add the following secrets to your GitHub repository at the **Repository level** 
 
 | Secret Name | Description |
 | :--- | :--- |
-| `GITHUB_PRIVATE_KEY` | The content of the Private Key file (.pem) you generated for your GitHub App. |
+| `GOTHUB_PRIVATE_KEY` | The content of the Private Key file (.pem) you generated for your GitHub App. |
 | `CODEBERG_TOKEN` | The Access Token for your Codeberg bot account. |
 
 ### 4. GitHub Repository Variables
@@ -53,14 +53,14 @@ Add the following secrets to your GitHub repository at the **Repository level** 
 Add the following variables to your GitHub repository at the **Repository level** (Settings -> Secrets and variables -> Actions -> **Variables** tab -> **Repository variables**):
 
 > [!NOTE]
-> The following configuration values can be defined as either **Variables** or **Secrets**. The workflow will check for a Secret first, and if not found, will look for a Variable. This allows you to hide sensitive configuration (like `GITHUB_APP_ID` or `CODEBERG_BOT_USERNAME`) if you prefer.
+> The following configuration values can be defined as either **Variables** or **Secrets**. The workflow will check for a Secret first, and if not found, will look for a Variable. This allows you to hide sensitive configuration (like `GOTHUB_APP_ID` or `CODEBERG_BOT_USERNAME`) if you prefer.
 
 | Variable Name | Description | Example |
 | :--- | :--- | :--- |
-| `GITHUB_APP_ID` | The App ID of your GitHub App. | `123456` |
+| `GOTHUB_APP_ID` | The App ID of your GitHub App. | `123456` |
 | `CODEBERG_BOT_USERNAME` | The username of your Codeberg bot account. | `my-renovate-bot` |
 | `RENOVATE_AUTODISCOVER_FILTER` | (Optional) Filter string to limit which repos are discovered. | `user/*` |
-| `GITHUB_INSTALLATION_WHITELIST` | (Optional) A comma-separated list of GitHub App Installation IDs or Owner names to explicitly run on. If not set, Renovate will run on all installations it discovers. | `12345,MyOrg` |
+| `GOTHUB_INSTALLATION_WHITELIST` | (Optional) A comma-separated list of GitHub App Installation IDs or Owner names to explicitly run on. If not set, Renovate will run on all installations it discovers. | `12345,MyOrg` |
 | `RENOVATE_HASH_ALL_NAMESPACES` | (Optional) If set to `true`, all namespace names (org/user) will be hashed in the GitHub Action job names. | `true` |
 | `LOG_LEVEL` | (Optional) Sets the log level for Renovate. Defaults to `fatal`. Possible values: `debug`, `info`, `warn`, `error`, `fatal`. | `debug` |
 | `MATRIX_MAX_PARALLEL` | (Optional) The maximum number of Renovate jobs to run in parallel. Defaults to `5`. | `10` |
@@ -80,7 +80,7 @@ If you want to hash **all** namespaces (including public ones), set the `RENOVAT
 >
 > Furthermore, running a very large number of jobs might lead to your account being flagged or even banned by GitHub.
 >
-> It is **highly recommended** to use the `GITHUB_INSTALLATION_WHITELIST` variable to limit the number of installations the workflow runs on, especially if your GitHub App is public.
+> It is **highly recommended** to use the `GOTHUB_INSTALLATION_WHITELIST` variable to limit the number of installations the workflow runs on, especially if your GitHub App is public.
 
 **Example `RENOVATE_AUTODISCOVER_FILTER`:**
 *   `user/*` (All repos owned by `user` - e.g., your personal username or organization name)
@@ -98,7 +98,7 @@ The workflow has been updated to support multi-tenant GitHub App installations. 
 1.  **`discover` Job:**
     *   This job runs first and connects to the GitHub API as the GitHub App.
     *   It fetches a list of all installations where the App is installed.
-    *   It filters this list based on the `GITHUB_INSTALLATION_WHITELIST` variable, if it's set.
+    *   It filters this list based on the `GOTHUB_INSTALLATION_WHITELIST` variable, if it's set.
     *   It dynamically generates a JSON matrix of configurations, with one entry for each installation (and a static one for Codeberg).
 
 2.  **`renovate` Job (Matrix Execution):**

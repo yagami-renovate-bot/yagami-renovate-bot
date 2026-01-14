@@ -24,8 +24,8 @@ jobs:
         uses: actions/create-github-app-token@v1
         id: generate_token
         with:
-          app-id: ${{ secrets.GITHUB_APP_ID || vars.GITHUB_APP_ID }}
-          private-key: ${{ secrets.GITHUB_PRIVATE_KEY }}
+          app-id: ${{ secrets.GOTHUB_APP_ID || vars.GOTHUB_APP_ID }}
+          private-key: ${{ secrets.GOTHUB_PRIVATE_KEY }}
 
       - name: Get Bot User ID
         id: get_bot_user_id
@@ -36,10 +36,10 @@ jobs:
       - name: Generate Matrix
         id: set-matrix
         env:
-          GITHUB_APP_ID: ${{ secrets.GITHUB_APP_ID || vars.GITHUB_APP_ID }}
-          GITHUB_PRIVATE_KEY: ${{ secrets.GITHUB_PRIVATE_KEY }}
+          GITHUB_APP_ID: ${{ secrets.GOTHUB_APP_ID || vars.GOTHUB_APP_ID }}
+          GITHUB_PRIVATE_KEY: ${{ secrets.GOTHUB_PRIVATE_KEY }}
           CODEBERG_BOT_USERNAME: ${{ secrets.CODEBERG_BOT_USERNAME || vars.CODEBERG_BOT_USERNAME }}
-          GITHUB_INSTALLATION_WHITELIST: ${{ secrets.GITHUB_INSTALLATION_WHITELIST || vars.GITHUB_INSTALLATION_WHITELIST }}
+          GITHUB_INSTALLATION_WHITELIST: ${{ secrets.GOTHUB_INSTALLATION_WHITELIST || vars.GOTHUB_INSTALLATION_WHITELIST }}
           RENOVATE_BOT_USER_ID: ${{ steps.get_bot_user_id.outputs.BOT_USER_ID }}
           RENOVATE_APP_SLUG: ${{ steps.generate_token.outputs.app-slug }}
           RENOVATE_HASH_ALL_NAMESPACES: ${{ secrets.RENOVATE_HASH_ALL_NAMESPACES || vars.RENOVATE_HASH_ALL_NAMESPACES }}
@@ -84,8 +84,8 @@ jobs:
         uses: actions/create-github-app-token@v1
         id: generate_token
         with:
-          app-id: ${{ secrets.GITHUB_APP_ID || vars.GITHUB_APP_ID }}
-          private-key: ${{ secrets.GITHUB_PRIVATE_KEY }}
+          app-id: ${{ secrets.GOTHUB_APP_ID || vars.GOTHUB_APP_ID }}
+          private-key: ${{ secrets.GOTHUB_PRIVATE_KEY }}
           owner: ${{ matrix.owner }}
 
       - name: Verify GitHub Token
