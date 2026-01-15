@@ -8,8 +8,9 @@ env:
 
 on:
   schedule:
-    # Run every 1 day
-    - cron: '0 0 * * *'
+    # Run every 1 day at 8:19am UTC+0
+    # avoids runners congestion
+    - cron: '19 8 * * *'
   workflow_dispatch:
 
 jobs:

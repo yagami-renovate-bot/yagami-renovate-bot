@@ -8,6 +8,8 @@ This guide explains how to set up the self-hosted Renovate bot for both GitHub a
 - A GitHub App for the GitHub integration.
 - A Codeberg Bot Account for the Codeberg integration.
 
+***
+
 ## Configuration
 
 ### 1. GitHub App (for GitHub)
@@ -27,8 +29,8 @@ This guide explains how to set up the self-hosted Renovate bot for both GitHub a
 3.  Generate a Private Key for the App.
 4.  Note the **App ID**.
 5.  Install the App on the repositories you want Renovate to manage.
-    > [!IMPORTANT]
-    > You **MUST** also install the App on the repository hosting the workflow. The workflow needs to generate an installation token to automatically fetch github BOT_USER_ID (different from github APP_ID) and github APP_SLUG
+> [!IMPORTANT]
+> You **MUST** also install the App on the repository hosting the workflow. The workflow needs to generate an installation token to automatically fetch github `BOT_USER_ID` (different from `GOTHUB_APP_ID`) and github `APP_SLUG`
 
 ### 2. Codeberg Bot Account (for Codeberg)
 
@@ -67,6 +69,12 @@ Add the following variables to your GitHub repository at the **Repository level*
 | `LOG_LEVEL` | (Optional) Sets the log level for Renovate. Defaults to `fatal`. Possible values: `debug`, `info`, `warn`, `error`, `fatal`. | `debug` |
 | `MATRIX_MAX_PARALLEL` | (Optional) The maximum number of Renovate jobs to run in parallel. Defaults to `5`. | `10` |
 
+**Example `RENOVATE_AUTODISCOVER_FILTER`:**
+*   `user/*` (All repos owned by `user` - e.g., your personal username or organization name)
+*   `{user1,user2}/*` (All repos owned by `user1` OR `user2` - useful if your GitHub and Codeberg usernames differ)
+*   `org/repo-name` (Specific repo only)
+*   `!org/exclude-repo` (Exclude specific repo)
+
 ### Namespace Hashing
 
 To protect privacy, the workflow automatically hashes the names of **private** namespaces (organizations or users) in the GitHub Actions job names.
@@ -84,14 +92,11 @@ If you want to hash **all** namespaces (including public ones), set the `RENOVAT
 >
 > It is **highly recommended** to use the `GOTHUB_INSTALLATION_WHITELIST` variable to limit the number of installations the workflow runs on, especially if your GitHub App is public.
 
-**Example `RENOVATE_AUTODISCOVER_FILTER`:**
-*   `user/*` (All repos owned by `user` - e.g., your personal username or organization name)
-*   `{user1,user2}/*` (All repos owned by `user1` OR `user2` - useful if your GitHub and Codeberg usernames differ)
-*   `org/repo-name` (Specific repo only)
-*   `!org/exclude-repo` (Exclude specific repo)
+### Warning on public instances
+> [!WARNING]
+> If you plan to make the instance publicly available and without autodiscover filters, read and understand [renovate security-and-permissions](https://docs.renovatebot.com/security-and-permissions) first!
 
-### Warning!
-- If you plan to make the instance publicly available and without autodiscover filters, read and understand [renovate security best practise](https://docs.renovatebot.com/security-and-permissions) first!
+***
 
 ## How it Works
 

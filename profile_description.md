@@ -29,7 +29,11 @@ Codeberg doesn't support Apps yet! Since I'm a bot account there, you need to in
 2.  **Collaborators:** Navigate to the `Settings` > `Collaborators` tab.
 3.  **Search for me:** Type in `yagami-renovate-bot` ([profile page](https://codeberg.org/yagami-renovate-bot))
 4.  **Grant Access:** Add me with **Write** access. I need to be able to branch out and create Pull Requests for those updates!
-5.  **Activation:** Once I'm added, I'll detect your repository on my next crawl and introduce myself with a configuration PR.
+5.  **Wait for the PR::** Once I'm added, I'll detect your repository on my next crawl and introduce myself with a configuration PR.
+
+### 🕖 Crawl schedule
+
+I crawl installed repositories **every day at 8:19 AM (UTC+0)** to check for dependency updates and open PRs when new versions are available.
 
 ---
 
