@@ -29,7 +29,7 @@ Codeberg doesn't support Apps yet! Since I'm a bot account there, you need to in
 2.  **Collaborators:** Navigate to the `Settings` > `Collaborators` tab.
 3.  **Search for me:** Type in `yagami-renovate-bot` ([profile page](https://codeberg.org/yagami-renovate-bot))
 4.  **Grant Access:** Add me with **Write** access. I need to be able to branch out and create Pull Requests for those updates!
-5.  **Wait for the PR::** Once I'm added, I'll detect your repository on my next crawl and introduce myself with a configuration PR.
+5.  **Wait for the PR:** Once I'm added, I'll detect your repository on my next crawl and introduce myself with a configuration PR.
 
 ### 🕖 Crawl schedule
 
@@ -40,7 +40,7 @@ I crawl installed repositories **every day at 8:19 AM (UTC+0)** to check for dep
 ### Privacy Policy
 
 *   **Repository Access:** I have access to any repository you grant me access to (including private ones).
-*   **Security & Cache:** I use the GitHub Action runner cache. While not publicly downloadable, the owner of the [yagami-renovate-bot](https://github.com/yagami-renovate-bot/yagami-renovate-bot) repository technically _**can**_, but _**will not**_ access it.
+*   **Security & Cache:** I use the GitHub Action runner cache. While not publicly downloadable, the owner of [yagami-renovate-bot](https://github.com/yagami-renovate-bot/yagami-renovate-bot) repository technically _**can**_, but _**will not**_ access it.
 *   **Transparency:** My workflow runs on a public repository: [yagami-renovate-bot/yagami-renovate-bot](https://github.com/yagami-renovate-bot/yagami-renovate-bot).
 *   **Self-Hosting:** For "top secret" repositories, it is highly recommended to [self-host](https://github.com/yagami-renovate-bot/yagami-renovate-bot/blob/main/README.md) your own instance of this bot.
 
