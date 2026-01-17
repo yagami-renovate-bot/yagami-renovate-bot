@@ -73,8 +73,8 @@ graph TD
     end
 ```
 
-## Credits are References:
+## Credits and References:
 - [Renovate Github Action Runner](https://github.com/renovatebot/github-action)
 
 ## License
-[AGPLv3 License](LICENSE)
+- [AGPLv3 License](LICENSE)

@@ -70,10 +70,11 @@ def main():
 
     matrix = []
     
-    # Forgejo (Static) - Prepend as requested
+    # Forgejo (Codeberg) - Prepend
     forgejo_entry = {
         "platform": "forgejo",
         "owner": "Codeberg",
+        "hashed_owner": "Codeberg",
         "installation_id": None,
         "endpoint": "https://codeberg.org/api/v1",
         "renovate_username": codeberg_bot_username,
@@ -93,13 +94,14 @@ def main():
                 logging.debug(f"Skipping installation: {owner} (ID: {inst_id})")
                 continue
         
-        display_owner = owner
+        hashed_owner = owner
         if hash_all_namespaces or inst['account'].get('user_view_type') != 'public': # assumes it's private if not public, i don't have any examples
-            display_owner = hashlib.sha1(owner.encode()).hexdigest()
+            hashed_owner = hashlib.sha1(owner.encode()).hexdigest()
 
         matrix.append({
             "platform": "github",
-            "owner": display_owner,
+            "owner": owner,
+            "hashed_owner": hashed_owner,
             "installation_id": inst['id'],
             "endpoint": "", # Default
             "renovate_username": app_slug,
