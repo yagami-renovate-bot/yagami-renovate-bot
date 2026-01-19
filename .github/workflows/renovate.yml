@@ -121,6 +121,10 @@ jobs:
           sudo mkdir -p /tmp/renovate
           sudo chown -R 12021:0 /tmp/renovate
 
+      - name: Mask Owner
+        if: matrix.platform == 'github'
+        run: echo "::add-mask::${{ matrix.owner }}"
+
       - name: Get GitHub App Token
         if: matrix.platform == 'github'
         uses: actions/create-github-app-token@v2.2.1
