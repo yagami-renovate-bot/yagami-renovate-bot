@@ -20,7 +20,7 @@ jobs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
       max_parallel: ${{ steps.set-matrix.outputs.max_parallel }}
     steps:
-      - uses: actions/checkout@v6.0.1
+      - uses: actions/checkout@v6.0.2
       - uses: actions/setup-python@v6.1.0
         with:
           python-version: '3.x'
@@ -88,7 +88,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v6.0.1
+        uses: actions/checkout@v6.0.2
 
       - name: Free Disk Space (Renovate)
         run: |
