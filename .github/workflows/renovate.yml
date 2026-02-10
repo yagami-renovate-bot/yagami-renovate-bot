@@ -20,8 +20,8 @@ jobs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
       max_parallel: ${{ steps.set-matrix.outputs.max_parallel }}
     steps:
-      - uses: actions/checkout@v6.0.1
-      - uses: actions/setup-python@v6.1.0
+      - uses: actions/checkout@v6.0.2
+      - uses: actions/setup-python@v6.2.0
         with:
           python-version: '3.x'
       - run: pip install requests pyjwt cryptography
@@ -53,7 +53,7 @@ jobs:
 
       - name: Cache Renovate Docker Image
         id: cache-renovate-image
-        uses: actions/cache@v5.0.2
+        uses: actions/cache@v5.0.3
         with:
           path: renovate-image.tar.zst
           key: renovate-image-${{ env.RENOVATE_VERSION }}
@@ -88,7 +88,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v6.0.1
+        uses: actions/checkout@v6.0.2
 
       - name: Free Disk Space (Renovate)
         run: |
@@ -99,7 +99,7 @@ jobs:
 
       - name: Restore Renovate Docker Image
         id: restore-renovate-image
-        uses: actions/cache@v5.0.2
+        uses: actions/cache@v5.0.3
         with:
           path: renovate-image.tar.zst
           key: renovate-image-${{ env.RENOVATE_VERSION }}
@@ -109,7 +109,7 @@ jobs:
         run: zstd -dc -T0 renovate-image.tar.zst | docker load
 
       - name: Cache Renovate
-        uses: actions/cache@v5.0.2
+        uses: actions/cache@v5.0.3
         with:
           path: /tmp/renovate
           key: renovate-${{ matrix.platform }}-${{ matrix.hashed_owner }}-${{ github.run_id }}
@@ -136,7 +136,7 @@ jobs:
 
       - name: Self-hosted Renovate (GitHub)
         if: matrix.platform == 'github'
-        uses: renovatebot/github-action@v44.2.6
+        uses: renovatebot/github-action@v46.0.2
         with:
           configurationFile: renovate-config.js
           token: ${{ steps.generate_token.outputs.token }}
@@ -151,7 +151,7 @@ jobs:
 
       - name: Self-hosted Renovate (Codeberg)
         if: matrix.platform == 'forgejo'
-        uses: renovatebot/github-action@v44.2.6
+        uses: renovatebot/github-action@v46.0.2
         with:
           configurationFile: renovate-config.js
           token: ${{ secrets.CODEBERG_TOKEN }}
