@@ -136,7 +136,7 @@ jobs:
 
       - name: Self-hosted Renovate (GitHub)
         if: matrix.platform == 'github'
-        uses: renovatebot/github-action@v46.0.2
+        uses: renovatebot/github-action@v46.1.2
         with:
           configurationFile: renovate-config.js
           token: ${{ steps.generate_token.outputs.token }}
@@ -151,7 +151,7 @@ jobs:
 
       - name: Self-hosted Renovate (Codeberg)
         if: matrix.platform == 'forgejo'
-        uses: renovatebot/github-action@v46.0.2
+        uses: renovatebot/github-action@v46.1.2
         with:
           configurationFile: renovate-config.js
           token: ${{ secrets.CODEBERG_TOKEN }}
