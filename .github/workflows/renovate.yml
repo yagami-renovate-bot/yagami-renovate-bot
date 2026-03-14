@@ -26,7 +26,7 @@ jobs:
           python-version: '3.x'
       - run: pip install requests pyjwt cryptography
       - name: Get GitHub App Token
-        uses: actions/create-github-app-token@v2.2.1
+        uses: actions/create-github-app-token@v2.2.2
         id: generate_token
         with:
           app-id: ${{ secrets.GOTHUB_APP_ID || vars.GOTHUB_APP_ID }}
@@ -127,7 +127,7 @@ jobs:
 
       - name: Get GitHub App Token
         if: matrix.platform == 'github'
-        uses: actions/create-github-app-token@v2.2.1
+        uses: actions/create-github-app-token@v2.2.2
         id: generate_token
         with:
           app-id: ${{ secrets.GOTHUB_APP_ID || vars.GOTHUB_APP_ID }}
