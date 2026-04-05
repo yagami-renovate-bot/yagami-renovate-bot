@@ -20,13 +20,13 @@ jobs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
       max_parallel: ${{ steps.set-matrix.outputs.max_parallel }}
     steps:
-      - uses: actions/checkout@v6.0.2
-      - uses: actions/setup-python@v6.2.0
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
         with:
           python-version: '3.x'
       - run: pip install requests pyjwt cryptography
       - name: Get GitHub App Token
-        uses: actions/create-github-app-token@v3.0.0
+        uses: actions/create-github-app-token@f8d387b68d61c58ab83c6c016672934102569859 # v3.0.0
         id: generate_token
         with:
           app-id: ${{ secrets.GOTHUB_APP_ID || vars.GOTHUB_APP_ID }}
@@ -53,7 +53,7 @@ jobs:
 
       - name: Cache Renovate Docker Image
         id: cache-renovate-image
-        uses: actions/cache@v5.0.4
+        uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5.0.4
         with:
           path: renovate-image.tar.zst
           key: renovate-image-${{ env.RENOVATE_VERSION }}
