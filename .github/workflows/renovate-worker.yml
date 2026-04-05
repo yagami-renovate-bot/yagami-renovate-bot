@@ -40,7 +40,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v6.0.2
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
       - name: Free Disk Space (Renovate)
         run: |
@@ -51,7 +51,7 @@ jobs:
 
       - name: Restore Renovate Docker Image
         id: restore-renovate-image
-        uses: actions/cache@v5.0.4
+        uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5.0.4
         with:
           path: renovate-image.tar.zst
           key: renovate-image-${{ env.RENOVATE_VERSION }}
@@ -61,7 +61,7 @@ jobs:
         run: zstd -dc -T0 renovate-image.tar.zst | docker load
 
       - name: Cache Renovate
-        uses: actions/cache@v5.0.4
+        uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5.0.4
         with:
           path: /tmp/renovate
           key: renovate-${{ inputs.platform }}-${{ inputs.hashed_owner }}-${{ github.run_id }}
@@ -75,7 +75,7 @@ jobs:
 
       - name: Get GitHub App Token
         if: inputs.platform == 'github'
-        uses: actions/create-github-app-token@v3.0.0
+        uses: actions/create-github-app-token@f8d387b68d61c58ab83c6c016672934102569859 # v3.0.0
         id: generate_token
         with:
           app-id: ${{ secrets.GOTHUB_APP_ID || vars.GOTHUB_APP_ID }}
@@ -84,7 +84,7 @@ jobs:
 
       - name: Self-hosted Renovate (GitHub)
         if: inputs.platform == 'github'
-        uses: renovatebot/github-action@v46.1.6
+        uses: renovatebot/github-action@68a3ea99af6ad249940b5a9fdf44fc6d7f14378b # v46.1.6
         with:
           configurationFile: renovate-config.js
           token: ${{ steps.generate_token.outputs.token }}
@@ -99,7 +99,7 @@ jobs:
 
       - name: Self-hosted Renovate (Codeberg)
         if: inputs.platform == 'forgejo'
-        uses: renovatebot/github-action@v46.1.6
+        uses: renovatebot/github-action@68a3ea99af6ad249940b5a9fdf44fc6d7f14378b # v46.1.6
         with:
           configurationFile: renovate-config.js
           token: ${{ secrets.CODEBERG_TOKEN }}
