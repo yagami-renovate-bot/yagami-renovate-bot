@@ -76,7 +76,6 @@ jobs:
   renovate:
     needs: discover
     name: Renovate (${{ matrix.platform }} - ${{ matrix.hashed_owner }})
-    runs-on: ubuntu-latest
     concurrency:
       group: renovate-${{ matrix.platform }}-${{ matrix.hashed_owner }}
       cancel-in-progress: false
@@ -85,86 +84,17 @@ jobs:
       max-parallel: ${{ fromJson(needs.discover.outputs.max_parallel) }}
       matrix:
         include: ${{ fromJson(needs.discover.outputs.matrix) }}
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v6.0.2
-
-      - name: Free Disk Space (Renovate)
-        run: |
-          sudo rm -rf /usr/share/dotnet
-          sudo rm -rf /usr/local/lib/android
-          sudo rm -rf /opt/ghc
-          sudo rm -rf /opt/hostedtoolcache/CodeQL
-
-      - name: Restore Renovate Docker Image
-        id: restore-renovate-image
-        uses: actions/cache@v5.0.4
-        with:
-          path: renovate-image.tar.zst
-          key: renovate-image-${{ env.RENOVATE_VERSION }}
-
-      - name: Load Renovate Docker Image
-        if: steps.restore-renovate-image.outputs.cache-hit == 'true'
-        run: zstd -dc -T0 renovate-image.tar.zst | docker load
-
-      - name: Cache Renovate
-        uses: actions/cache@v5.0.4
-        with:
-          path: /tmp/renovate
-          key: renovate-${{ matrix.platform }}-${{ matrix.hashed_owner }}-${{ github.run_id }}
-          restore-keys: |
-            renovate-${{ matrix.platform }}-${{ matrix.hashed_owner }}-
-
-      - name: Fix Cache Permissions
-        run: |
-          sudo mkdir -p /tmp/renovate
-          sudo chown -R 12021:0 /tmp/renovate
-
-      - name: Mask Owner
-        if: matrix.platform == 'github'
-        run: echo "::add-mask::${{ matrix.owner }}"
-
-      - name: Get GitHub App Token
-        if: matrix.platform == 'github'
-        uses: actions/create-github-app-token@v3.0.0
-        id: generate_token
-        with:
-          app-id: ${{ secrets.GOTHUB_APP_ID || vars.GOTHUB_APP_ID }}
-          private-key: ${{ secrets.GOTHUB_PRIVATE_KEY }}
-          owner: ${{ matrix.owner }}
-
-      - name: Self-hosted Renovate (GitHub)
-        if: matrix.platform == 'github'
-        uses: renovatebot/github-action@v46.1.6
-        with:
-          configurationFile: renovate-config.js
-          token: ${{ steps.generate_token.outputs.token }}
-          renovate-version: ${{ env.RENOVATE_VERSION }}
-        env:
-          RENOVATE_PLATFORM: ${{ matrix.platform }}
-          RENOVATE_ENDPOINT: ${{ matrix.endpoint }}
-          RENOVATE_USERNAME: ${{ matrix.renovate_username }}
-          RENOVATE_GIT_AUTHOR: ${{ matrix.git_author }}
-          RENOVATE_AUTODISCOVER_FILTER: ${{ secrets.RENOVATE_AUTODISCOVER_FILTER || vars.RENOVATE_AUTODISCOVER_FILTER }}
-          LOG_LEVEL: ${{ secrets.LOG_LEVEL || vars.LOG_LEVEL || 'fatal' }} # Defaults to max level to prevent info leaks on action log
-
-      - name: Self-hosted Renovate (Codeberg)
-        if: matrix.platform == 'forgejo'
-        uses: renovatebot/github-action@v46.1.6
-        with:
-          configurationFile: renovate-config.js
-          token: ${{ secrets.CODEBERG_TOKEN }}
-          renovate-version: ${{ env.RENOVATE_VERSION }}
-        env:
-          RENOVATE_PLATFORM: ${{ matrix.platform }}
-          RENOVATE_ENDPOINT: ${{ matrix.endpoint }}
-          RENOVATE_USERNAME: ${{ matrix.renovate_username }}
-          RENOVATE_GIT_AUTHOR: ${{ matrix.git_author }}
-          RENOVATE_AUTODISCOVER_FILTER: ${{ secrets.RENOVATE_AUTODISCOVER_FILTER || vars.RENOVATE_AUTODISCOVER_FILTER }}
-          LOG_LEVEL: ${{ secrets.LOG_LEVEL || vars.LOG_LEVEL || 'fatal' }} # Defaults to max level to prevent info leaks on action log
-
-      - name: Fix Cache Permissions for Save
-        if: always()
-        run: |
-          sudo chown -R $USER /tmp/renovate
+    uses: ./.github/workflows/renovate-worker.yml
+    with:
+      platform: ${{ matrix.platform }}
+      hashed_owner: ${{ matrix.hashed_owner }}
+      endpoint: ${{ matrix.endpoint }}
+      renovate_username: ${{ matrix.renovate_username }}
+      git_author: ${{ matrix.git_author }}
+    secrets:
+      owner: ${{ matrix.owner }}
+      GOTHUB_APP_ID: ${{ secrets.GOTHUB_APP_ID }}
+      GOTHUB_PRIVATE_KEY: ${{ secrets.GOTHUB_PRIVATE_KEY }}
+      CODEBERG_TOKEN: ${{ secrets.CODEBERG_TOKEN }}
+      RENOVATE_AUTODISCOVER_FILTER: ${{ secrets.RENOVATE_AUTODISCOVER_FILTER }}
+      LOG_LEVEL: ${{ secrets.LOG_LEVEL }}

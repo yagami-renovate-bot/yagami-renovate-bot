@@ -15,6 +15,12 @@ const config = {
   optimizeForDisabled: false,
   repositoryCache: 'enabled',
 
+  // Modify this as you see fit
+  extends: ['config:best-practices'],
+  onboardingConfig: {
+    extends: ['config:best-practices'],
+  },
+
   // Security: Prevent execution of arbitrary commands
   allowedCommands: [],
   allowedUnsafeExecutions: [],
