@@ -104,7 +104,7 @@ def main():
             "hashed_owner": hashed_owner,
             "installation_id": inst['id'],
             "endpoint": "", # Default
-            "renovate_username": app_slug,
+            "renovate_username": f"{app_slug}[bot]",
             "git_author": f"{app_slug}[bot] <{bot_user_id}+{app_slug}[bot]@users.noreply.github.com>"
         })
 
