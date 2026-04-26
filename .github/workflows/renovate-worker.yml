@@ -84,7 +84,7 @@ jobs:
 
       - name: Self-hosted Renovate (GitHub)
         if: inputs.platform == 'github'
-        uses: renovatebot/github-action@eb932558ad942cccfd8211cf535f17ff183a9f74 # v46.1.9
+        uses: renovatebot/github-action@83ec54fee49ab67d9cd201084c1ff325b4b462e4 # v46.1.10
         with:
           configurationFile: renovate-config.js
           token: ${{ steps.generate_token.outputs.token }}
@@ -99,7 +99,7 @@ jobs:
 
       - name: Self-hosted Renovate (Codeberg)
         if: inputs.platform == 'forgejo'
-        uses: renovatebot/github-action@eb932558ad942cccfd8211cf535f17ff183a9f74 # v46.1.9
+        uses: renovatebot/github-action@83ec54fee49ab67d9cd201084c1ff325b4b462e4 # v46.1.10
         with:
           configurationFile: renovate-config.js
           token: ${{ secrets.CODEBERG_TOKEN }}
