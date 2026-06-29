@@ -29,11 +29,15 @@ on:
         required: false
       RENOVATE_AUTODISCOVER_FILTER:
         required: false
+      RENOVATE_AUTODISCOVER_FILTER_GITHUB:
+        required: false
+      RENOVATE_AUTODISCOVER_FILTER_CODEBERG:
+        required: false
       LOG_LEVEL:
         required: false
 
 env:
-  RENOVATE_VERSION: 42.81.5-full
+  RENOVATE_VERSION: 42.81.5-full@sha256:d8a8d356115205613eeb60122ca658404df02f45cbf5cdc895efe25bae4b0265
 
 jobs:
   run:
@@ -94,7 +98,7 @@ jobs:
           RENOVATE_ENDPOINT: ${{ inputs.endpoint }}
           RENOVATE_USERNAME: ${{ inputs.renovate_username }}
           RENOVATE_GIT_AUTHOR: ${{ inputs.git_author }}
-          RENOVATE_AUTODISCOVER_FILTER: ${{ secrets.RENOVATE_AUTODISCOVER_FILTER || vars.RENOVATE_AUTODISCOVER_FILTER }}
+          RENOVATE_AUTODISCOVER_FILTER: ${{ secrets.RENOVATE_AUTODISCOVER_FILTER_GITHUB || secrets.RENOVATE_AUTODISCOVER_FILTER || vars.RENOVATE_AUTODISCOVER_FILTER_GITHUB || vars.RENOVATE_AUTODISCOVER_FILTER }}
           LOG_LEVEL: ${{ secrets.LOG_LEVEL || vars.LOG_LEVEL || 'fatal' }}  # Defaults to max level to prevent info leaks on action log
 
       - name: Self-hosted Renovate (Codeberg)
@@ -109,7 +113,7 @@ jobs:
           RENOVATE_ENDPOINT: ${{ inputs.endpoint }}
           RENOVATE_USERNAME: ${{ inputs.renovate_username }}
           RENOVATE_GIT_AUTHOR: ${{ inputs.git_author }}
-          RENOVATE_AUTODISCOVER_FILTER: ${{ secrets.RENOVATE_AUTODISCOVER_FILTER || vars.RENOVATE_AUTODISCOVER_FILTER }}
+          RENOVATE_AUTODISCOVER_FILTER: ${{ secrets.RENOVATE_AUTODISCOVER_FILTER_CODEBERG || secrets.RENOVATE_AUTODISCOVER_FILTER || vars.RENOVATE_AUTODISCOVER_FILTER_CODEBERG || vars.RENOVATE_AUTODISCOVER_FILTER }}
           LOG_LEVEL: ${{ secrets.LOG_LEVEL || vars.LOG_LEVEL || 'fatal' }}  # Defaults to max level to prevent info leaks on action log
 
       - name: Fix Cache Permissions for Save

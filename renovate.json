@@ -1,3 +1,21 @@
 {
-  "$schema": "https://docs.renovatebot.com/renovate-schema.json"
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "docker": {
+    "pinDigests": true
+  },
+  "customManagers": [
+    {
+      "customType": "regex",
+      "description": "Update Renovate Docker image version+digest in workflows",
+      "fileMatch": [
+        "^\\.github/workflows/renovate\\.yml$",
+        "^\\.github/workflows/renovate-worker\\.yml$"
+      ],
+      "matchStrings": [
+        "RENOVATE_VERSION:\\s*(?<currentValue>[^@\\s#]+)(?:@(?<currentDigest>sha256:[a-f0-9]+))?\\s*?(?:#|$)"
+      ],
+      "datasourceTemplate": "docker",
+      "depNameTemplate": "ghcr.io/renovatebot/renovate"
+    }
+  ]
 }
