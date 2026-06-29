@@ -51,7 +51,7 @@ jobs:
 
       - name: Restore Renovate Docker Image
         id: restore-renovate-image
-        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: renovate-image.tar.zst
           key: renovate-image-${{ env.RENOVATE_VERSION }}
@@ -61,7 +61,7 @@ jobs:
         run: zstd -dc -T0 renovate-image.tar.zst | docker load
 
       - name: Cache Renovate
-        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: /tmp/renovate
           key: renovate-${{ inputs.platform }}-${{ inputs.hashed_owner }}-${{ github.run_id }}
@@ -84,7 +84,7 @@ jobs:
 
       - name: Self-hosted Renovate (GitHub)
         if: inputs.platform == 'github'
-        uses: renovatebot/github-action@693b9ef15eec82123529a37c782242f091365961 # v46.1.14
+        uses: renovatebot/github-action@dd5302ec17783b2fc721b19ae7209b57b1587765 # v46.1.17
         with:
           configurationFile: renovate-config.js
           token: ${{ steps.generate_token.outputs.token }}
@@ -99,7 +99,7 @@ jobs:
 
       - name: Self-hosted Renovate (Codeberg)
         if: inputs.platform == 'forgejo'
-        uses: renovatebot/github-action@693b9ef15eec82123529a37c782242f091365961 # v46.1.14
+        uses: renovatebot/github-action@dd5302ec17783b2fc721b19ae7209b57b1587765 # v46.1.17
         with:
           configurationFile: renovate-config.js
           token: ${{ secrets.CODEBERG_TOKEN }}
