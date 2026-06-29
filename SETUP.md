@@ -63,15 +63,25 @@ Add the following variables to your GitHub repository at the **Repository level*
 | :--- | :--- | :--- |
 | `GOTHUB_APP_ID` | The App ID of your GitHub App. | `123456` |
 | `CODEBERG_BOT_USERNAME` | The username of your Codeberg bot account. | `my-renovate-bot` |
-| `RENOVATE_AUTODISCOVER_FILTER` | (Optional) Filter string to limit which repos are discovered. | `user/*` |
+| `RENOVATE_AUTODISCOVER_FILTER_GITHUB` | (Optional) Filter string to limit which **GitHub** repos are discovered. | `my-org/*` |
+| `RENOVATE_AUTODISCOVER_FILTER_CODEBERG` | (Optional) Filter string to limit which **Codeberg** repos are discovered. | `my-user/*` |
+| `RENOVATE_AUTODISCOVER_FILTER` | (Optional, Fallback) Global filter applied to **both** platforms if the per-platform filters above are not set. | `user/*` |
 | `GOTHUB_INSTALLATION_WHITELIST` | (Optional) A comma-separated list of GitHub App Installation IDs or Owner names to explicitly run on. If not set, Renovate will run on all installations it discovers. | `12345,MyOrg` |
 | `RENOVATE_HASH_ALL_NAMESPACES` | (Optional) If set to `true`, all namespace names (org/user) will be hashed in the GitHub Action job names. | `true` |
 | `LOG_LEVEL` | (Optional) Sets the log level for Renovate. Defaults to `fatal`. Possible values: `debug`, `info`, `warn`, `error`, `fatal`. | `debug` |
 | `MATRIX_MAX_PARALLEL` | (Optional) The maximum number of Renovate jobs to run in parallel. Defaults to `5`. | `10` |
 
-**Example `RENOVATE_AUTODISCOVER_FILTER`:**
-*   `user/*` (All repos owned by `user` - e.g., your personal username or organization name)
-*   `{user1,user2}/*` (All repos owned by `user1` OR `user2` - useful if your GitHub and Codeberg usernames differ)
+> [!IMPORTANT]
+> **Security: Use Per-Platform Filters**
+> It is highly recommended to use `RENOVATE_AUTODISCOVER_FILTER_GITHUB` and `RENOVATE_AUTODISCOVER_FILTER_CODEBERG` instead of the global `RENOVATE_AUTODISCOVER_FILTER`. Using a single global filter can lead to **cross-platform name hijacking**, where a bad actor registers a username on one platform that matches your filter for the other platform. Per-platform filters prevent this by scoping each filter to its intended platform only.
+
+**Example Per-Platform Filters:**
+*   `RENOVATE_AUTODISCOVER_FILTER_GITHUB`: `my-github-org/*`
+*   `RENOVATE_AUTODISCOVER_FILTER_CODEBERG`: `my-codeberg-user/*`
+
+**Fallback `RENOVATE_AUTODISCOVER_FILTER` Examples:**
+*   `user/*` (All repos owned by `user` on **both** platforms)
+*   `user1/*,user2/*` (All repos owned by `user1` OR `user2` on **both** platforms)
 *   `org/repo-name` (Specific repo only)
 *   `!org/exclude-repo` (Exclude specific repo)
 
