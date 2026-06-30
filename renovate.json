@@ -9,7 +9,7 @@
         "/^\\.github/workflows/renovate-worker\\.yml$/"
       ],
       "matchStrings": [
-        "RENOVATE_VERSION:\\s*(?<currentValue>[^@\\s#]+)(?:@(?<currentDigest>sha256:[a-f0-9]+))?\\s*?(?:#|$)"
+        "RENOVATE_VERSION:\\s*(?<currentValue>[^@\\s#]+)(?:@(?<currentDigest>sha256:[a-f0-9]+))?"
       ],
       "datasourceTemplate": "docker",
       "depNameTemplate": "ghcr.io/renovatebot/renovate"
