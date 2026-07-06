@@ -27,6 +27,8 @@ on:
         required: false
       CODEBERG_TOKEN:
         required: false
+      GOTHUB_COM_TOKEN:
+        required: false
       RENOVATE_AUTODISCOVER_FILTER:
         required: false
       RENOVATE_AUTODISCOVER_FILTER_GITHUB:
@@ -82,7 +84,7 @@ jobs:
         uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
         id: generate_token
         with:
-          app-id: ${{ secrets.GOTHUB_APP_ID || vars.GOTHUB_APP_ID }}
+          client-id: ${{ secrets.GOTHUB_APP_ID || vars.GOTHUB_APP_ID }}
           private-key: ${{ secrets.GOTHUB_PRIVATE_KEY }}
           owner: ${{ secrets.owner }}
 
@@ -114,6 +116,7 @@ jobs:
           RENOVATE_USERNAME: ${{ inputs.renovate_username }}
           RENOVATE_GIT_AUTHOR: ${{ inputs.git_author }}
           RENOVATE_AUTODISCOVER_FILTER: ${{ secrets.RENOVATE_AUTODISCOVER_FILTER_CODEBERG || secrets.RENOVATE_AUTODISCOVER_FILTER || vars.RENOVATE_AUTODISCOVER_FILTER_CODEBERG || vars.RENOVATE_AUTODISCOVER_FILTER }}
+          RENOVATE_GITHUB_COM_TOKEN: ${{ secrets.GOTHUB_COM_TOKEN }}
           LOG_LEVEL: ${{ secrets.LOG_LEVEL || vars.LOG_LEVEL || 'fatal' }}  # Defaults to max level to prevent info leaks on action log
 
       - name: Fix Cache Permissions for Save

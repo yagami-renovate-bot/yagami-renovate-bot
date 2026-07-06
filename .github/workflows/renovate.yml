@@ -29,7 +29,7 @@ jobs:
         uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
         id: generate_token
         with:
-          app-id: ${{ secrets.GOTHUB_APP_ID || vars.GOTHUB_APP_ID }}
+          client-id: ${{ secrets.GOTHUB_APP_ID || vars.GOTHUB_APP_ID }}
           private-key: ${{ secrets.GOTHUB_PRIVATE_KEY }}
 
       - name: Get Bot User ID
@@ -96,6 +96,7 @@ jobs:
       GOTHUB_APP_ID: ${{ secrets.GOTHUB_APP_ID }}
       GOTHUB_PRIVATE_KEY: ${{ secrets.GOTHUB_PRIVATE_KEY }}
       CODEBERG_TOKEN: ${{ secrets.CODEBERG_TOKEN }}
+      GOTHUB_COM_TOKEN: ${{ secrets.GOTHUB_COM_TOKEN }}
       RENOVATE_AUTODISCOVER_FILTER: ${{ secrets.RENOVATE_AUTODISCOVER_FILTER }}
       RENOVATE_AUTODISCOVER_FILTER_GITHUB: ${{ secrets.RENOVATE_AUTODISCOVER_FILTER_GITHUB }}
       RENOVATE_AUTODISCOVER_FILTER_CODEBERG: ${{ secrets.RENOVATE_AUTODISCOVER_FILTER_CODEBERG }}
