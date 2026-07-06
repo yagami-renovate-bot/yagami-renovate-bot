@@ -51,6 +51,7 @@ Add the following secrets to your GitHub repository at the **Repository level** 
 | :--- | :--- |
 | `GOTHUB_PRIVATE_KEY` | The content of the Private Key file (.pem) you generated for your GitHub App. |
 | `CODEBERG_TOKEN` | The Access Token for your Codeberg bot account. |
+| `GOTHUB_COM_TOKEN` | A GitHub Personal Access Token (classic) with read-only access. Used by Renovate when running on Codeberg to increase the GitHub API rate limit for fetching changelogs, diffs, and dependency info (e.g., Go modules hosted on GitHub). |
 
 ### 4. GitHub Repository Variables
 
