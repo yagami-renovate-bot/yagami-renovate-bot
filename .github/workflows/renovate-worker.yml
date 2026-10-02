@@ -39,7 +39,7 @@ on:
         required: false
 
 env:
-  RENOVATE_VERSION: 44.115.4-full@sha256:8a9d4f8d780843a4ecdf4a2318bc27e1df6e19df74313fd19cd35669edca0fd8
+  RENOVATE_VERSION: 44.132.2-full@sha256:25853f3a08ed066455e18ca7e049ab992bc5f1c39fc1e52af27ec640d9d4418e
 
 jobs:
   run:
