@@ -3,7 +3,7 @@ name: Renovate
 permissions: read-all
 
 env:
-  RENOVATE_VERSION: 44.115.4-full@sha256:8a9d4f8d780843a4ecdf4a2318bc27e1df6e19df74313fd19cd35669edca0fd8
+  RENOVATE_VERSION: 44.188.2-full@sha256:86ea6dd077df3a5e9e8ac44f109819a28984cd8d793088069ffdbddfe486d9b5
   RENOVATE_IMAGE: ghcr.io/renovatebot/renovate
 
 on:
